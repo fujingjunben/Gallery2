@@ -308,6 +308,9 @@ public class FilterDrawRepresentation extends FilterRepresentation {
         mCurrent.noPoints++;
     }
 
+    // 只有up事件发生的时候才会执行此方法
+    // 所以在ImageFilterDraw绘制的时候，要检测mCurrent是不是为空，
+    // 如果不为空，就要将mCurrent绘制上去
     public void endSection(float x, float y) {
         addPoint(x, y);
         mDrawing.add(mCurrent);

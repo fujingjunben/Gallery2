@@ -28,11 +28,13 @@ import android.graphics.PathMeasure;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.PorterDuffXfermode;
+import android.graphics.RectF;
 
 import com.android.gallery3d.R;
 import com.android.gallery3d.filtershow.filters.FilterDrawRepresentation.StrokeData;
 import com.android.gallery3d.filtershow.imageshow.PrimaryImage;
 import com.android.gallery3d.filtershow.pipeline.FilterEnvironment;
+
 import java.util.Vector;
 
 public class ImageFilterDraw extends ImageFilter {
@@ -51,13 +53,14 @@ public class ImageFilterDraw extends ImageFilter {
         mName = "Image Draw";
     }
 
-    DrawStyle[] mDrawingsTypes = new DrawStyle[] {
+    DrawStyle[] mDrawingsTypes = new DrawStyle[]{
             new SimpleDraw(0),
-            new SimpleDraw(1),
-            new Brush(R.drawable.brush_gauss),
-            new Brush(R.drawable.brush_marker),
+            new LineDraw(1),
+            new RectangleDraw(0),
+            new EllipseDraw(1),
             new Brush(R.drawable.brush_spatter)
     };
+
     {
         for (int i = 0; i < mDrawingsTypes.length; i++) {
             mDrawingsTypes[i].setType((byte) i);
@@ -86,8 +89,9 @@ public class ImageFilterDraw extends ImageFilter {
 
     public static interface DrawStyle {
         public void setType(byte type);
+
         public void paint(StrokeData sd, Canvas canvas, Matrix toScrMatrix,
-                int quality);
+                          int quality);
     }
 
     class SimpleDraw implements DrawStyle {
@@ -105,7 +109,7 @@ public class ImageFilterDraw extends ImageFilter {
 
         @Override
         public void paint(StrokeData sd, Canvas canvas, Matrix toScrMatrix,
-                int quality) {
+                          int quality) {
             if (sd == null) {
                 return;
             }
@@ -130,9 +134,77 @@ public class ImageFilterDraw extends ImageFilter {
 
             // done this way because of a bug in path.transform(matrix)
             Path mCacheTransPath = new Path();
-            mCacheTransPath.addPath(sd.mPath, toScrMatrix);
+            if (sd.mEraser) {
+                mCacheTransPath.addPath(sd.mPath, toScrMatrix);
+            } else {
+                mCacheTransPath.addPath(drawShape(sd), toScrMatrix);
+            }
 
             canvas.drawPath(mCacheTransPath, paint);
+        }
+
+        public Path drawShape(StrokeData sd) {
+            return sd.mPath;
+        }
+    }
+
+    class RectangleDraw extends SimpleDraw {
+        public RectangleDraw(int mode) {
+            super(mode);
+        }
+
+        @Override
+        public Path drawShape(StrokeData sd) {
+            float startX = sd.mPoints[0];
+            float startY = sd.mPoints[1];
+            float x = sd.mPoints[sd.noPoints * 2 - 2];
+            float y = sd.mPoints[sd.noPoints * 2 - 1];
+            float left = Math.min(startX, x);
+            float right = Math.max(startX, x);
+            float top = Math.min(startY, y);
+            float bottom = Math.max(startY, y);
+
+            Path path = new Path();
+            path.addRect(left, top, right, bottom, Path.Direction.CCW);
+            return path;
+        }
+    }
+
+    class EllipseDraw extends SimpleDraw {
+        public EllipseDraw(int mode) {
+            super(mode);
+        }
+
+        @Override
+        public Path drawShape(StrokeData sd) {
+            float startX = sd.mPoints[0];
+            float startY = sd.mPoints[1];
+            float x = sd.mPoints[sd.noPoints * 2 - 2];
+            float y = sd.mPoints[sd.noPoints * 2 - 1];
+
+            RectF rect = new RectF(startX, startY, x, y);
+
+            Path path = new Path();
+            path.addOval(rect, Path.Direction.CCW);
+            return path;
+        }
+    }
+
+    class LineDraw extends SimpleDraw {
+        public LineDraw(int mode) {
+            super(mode);
+        }
+
+        @Override
+        public Path drawShape(StrokeData sd) {
+            float startX = sd.mPoints[0];
+            float startY = sd.mPoints[1];
+            float x = sd.mPoints[sd.noPoints * 2 - 2];
+            float y = sd.mPoints[sd.noPoints * 2 - 1];
+            Path path = new Path();
+            path.moveTo(startX, startY);
+            path.lineTo(x, y);
+            return path;
         }
     }
 
@@ -158,8 +230,8 @@ public class ImageFilterDraw extends ImageFilter {
 
         @Override
         public void paint(StrokeData sd, Canvas canvas,
-                Matrix toScrMatrix,
-                int quality) {
+                          Matrix toScrMatrix,
+                          int quality) {
             if (sd == null || sd.mPath == null) {
                 return;
             }
@@ -172,8 +244,7 @@ public class ImageFilterDraw extends ImageFilter {
                     mCacheTransPath);
         }
 
-        public Bitmap createScaledBitmap(Bitmap src, int dstWidth, int dstHeight, boolean filter)
-        {
+        public Bitmap createScaledBitmap(Bitmap src, int dstWidth, int dstHeight, boolean filter) {
             Matrix m = new Matrix();
             m.setScale(dstWidth / (float) src.getWidth(), dstHeight / (float) src.getHeight());
             Bitmap result = Bitmap.createBitmap(dstWidth, dstHeight, src.getConfig());
@@ -186,6 +257,7 @@ public class ImageFilterDraw extends ImageFilter {
             return result;
 
         }
+
         void draw(Canvas canvas, Paint paint, int color, float size, Path path) {
             PathMeasure mPathMeasure = new PathMeasure();
             float[] mPosition = new float[2];
@@ -218,7 +290,7 @@ public class ImageFilterDraw extends ImageFilter {
     }
 
     void paint(StrokeData sd, Canvas canvas, Matrix toScrMatrix,
-            int quality) {
+               int quality) {
         mDrawingsTypes[sd.mType].paint(sd, canvas, toScrMatrix, quality);
     }
 
@@ -257,14 +329,26 @@ public class ImageFilterDraw extends ImageFilter {
         if (mCachedStrokes < mParameters.getDrawing().size()) {
             fillBuffer(originalRotateToScreen);
         }
+
+        // mOverlayBitmap 是缓存位图，上一次绘制的内容都在缓存在这里
         canvas.drawBitmap(mOverlayBitmap, 0, 0, paint);
 
+        // 只有UP事件的时候，currentDrawing才会加入到drawing列表，并
+        // 将mCurrent置为空
         StrokeData stroke = mParameters.getCurrentDrawing();
         if (stroke != null) {
             paint(stroke, canvas, originalRotateToScreen, quality);
         }
     }
 
+    /**
+     * mCachedStrokes表示已绘制的路径
+     * v：总共的路径
+     * 如果已绘制的路径少于总共的路径，则
+     * 绘制剩下的路径
+     *
+     * @param originalRotateToScreen
+     */
     public void fillBuffer(Matrix originalRotateToScreen) {
         Canvas drawCache = new Canvas(mOverlayBitmap);
         Vector<StrokeData> v = mParameters.getDrawing();
@@ -292,12 +376,13 @@ public class ImageFilterDraw extends ImageFilter {
         Matrix m = getOriginalToScreenMatrix(w, h);
         Bitmap mOverlayBitmap = Bitmap.createBitmap(
                 w, h, Bitmap.Config.ARGB_8888);
-
+//
         drawData(new Canvas(mOverlayBitmap), m, quality);
 
         Canvas canvas = new Canvas(bitmap);
         Paint paint = new Paint(Paint.FILTER_BITMAP_FLAG);
         canvas.drawBitmap(mOverlayBitmap, 0, 0, paint);
+//        drawData(new Canvas(bitmap), m ,quality);
         return bitmap;
     }
 

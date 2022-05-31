@@ -16,6 +16,7 @@
 
 package com.android.gallery3d.filtershow.editors;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -136,16 +137,6 @@ public class EditorDraw extends ParametricEditor implements FilterView {
 
     @Override
     public void openUtilityPanel(final LinearLayout accessoryViewList, final LinearLayout listOptions) {
-//        Button view = (Button) accessoryViewList.findViewById(R.id.applyEffect);
-//        view.setText(mContext.getString(R.string.draw_color));
-//        view.setOnClickListener(new OnClickListener() {
-//
-//            @Override
-//            public void onClick(View arg0) {
-//                showPopupMenu(accessoryViewList);
-//            }
-//        });
-
         for (int id : options) {
             final Button button = (Button) listOptions.findViewById(id);
             button.setOnClickListener(new OnClickListener() {
@@ -157,6 +148,7 @@ public class EditorDraw extends ParametricEditor implements FilterView {
         }
     }
 
+    @SuppressLint("NonConstantResourceId")
     protected void selectButton(Button button) {
         ImageFilterDraw filter = (ImageFilterDraw) mImageShow.getCurrentFilter();
         FilterDrawRepresentation rep = getDrawRep();
@@ -202,84 +194,6 @@ public class EditorDraw extends ParametricEditor implements FilterView {
     @Override
     public boolean showsSeekBar() {
         return false;
-    }
-
-    private void showPopupMenu(LinearLayout accessoryViewList) {
-        final Button button = (Button) accessoryViewList.findViewById(
-                R.id.applyEffect);
-        if (button == null) {
-            return;
-        }
-        final PopupMenu popupMenu = new PopupMenu(mImageShow.getActivity(), button);
-        popupMenu.getMenuInflater().inflate(R.menu.filtershow_menu_draw, popupMenu.getMenu());
-        if (!ParametricEditor.useCompact(mContext)) {
-            Menu menu = popupMenu.getMenu();
-            int count = menu.size();
-            for (int i = 0; i < count; i++) {
-                MenuItem item = menu.getItem(i);
-                if (item.getItemId() != R.id.draw_menu_clear) {
-                    item.setVisible(false);
-                }
-            }
-            popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    clearDrawing();
-                    return true;
-                }
-            });
-        } else {
-            popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    selectMenuItem(item);
-                    return true;
-                }
-            });
-        }
-        popupMenu.show();
-        ((FilterShowActivity) mContext).onShowMenu(popupMenu);
-    }
-
-    protected void selectMenuItem(MenuItem item) {
-        ImageFilterDraw filter = (ImageFilterDraw) mImageShow.getCurrentFilter();
-        FilterDrawRepresentation rep = getDrawRep();
-        if (rep == null) {
-            return;
-        }
-
-        switch (item.getItemId()) {
-            case R.id.draw_menu_clear:
-                clearDrawing();
-                break;
-            case R.id.draw_menu_size:
-                rep.setPramMode(FilterDrawRepresentation.PARAM_SIZE);
-                break;
-            case R.id.draw_menu_style:
-                rep.setPramMode(FilterDrawRepresentation.PARAM_STYLE);
-                break;
-            case R.id.draw_menu_color:
-                rep.setPramMode(FilterDrawRepresentation.PARAM_COLOR);
-                break;
-        }
-        if (item.getItemId() != R.id.draw_menu_clear) {
-            mParameterString = item.getTitle().toString();
-            updateText();
-        }
-        // 如果当前控制器是颜色选择，就拿到当前选择的颜色
-        if (mControl instanceof ColorChooser) {
-            ColorChooser c = (ColorChooser) mControl;
-            mBasColors = c.getColorSet();
-        }
-        control(rep.getCurrentParam(), mEditControl);
-        if (mControl instanceof ColorChooser) {
-            ColorChooser c = (ColorChooser) mControl;
-            c.setColorSet(mBasColors);
-        }
-        mControl.updateUI();
-        mView.invalidate();
     }
 
     public void clearDrawing() {
