@@ -50,7 +50,7 @@ find_library( # Sets the name of the path variable.
 include_directories(../jpeg)
 
 add_library(jpeg SHARED IMPORTED )
-set_target_properties(jpeg PROPERTIES IMPORTED_LOCATION ../../../../libs/armeabi-v7a/libjpeg.so)
+set_target_properties(jpeg PROPERTIES IMPORTED_LOCATION ../../../../libs/${ANDROID_ABI}/libjpeg.so)
 
 # Specifies libraries CMake should link to your target library. You
 # can link multiple libraries, such as libraries you define in this

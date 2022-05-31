@@ -276,6 +276,7 @@ public class ImageShow extends View implements OnGestureListener,
         mShadowDrawn = false;
 
         Bitmap highresPreview = PrimaryImage.getImage().getHighresImage();
+
         Bitmap fullHighres = PrimaryImage.getImage().getPartialImage();
 
         boolean isDoingNewLookAnimation = PrimaryImage.getImage().onGoingNewLookAnimation();
@@ -286,8 +287,8 @@ public class ImageShow extends View implements OnGestureListener,
             drawImageAndAnimate(canvas, highresPreview);
         }
 
-        drawHighresImage(canvas, fullHighres);
-        drawCompareImage(canvas, getGeometryOnlyImage());
+//        drawHighresImage(canvas, fullHighres);
+//        drawCompareImage(canvas, getGeometryOnlyImage());
 
         canvas.restore();
 

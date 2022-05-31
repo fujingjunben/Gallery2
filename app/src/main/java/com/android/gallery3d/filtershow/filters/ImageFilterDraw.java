@@ -27,6 +27,8 @@ import android.graphics.Path;
 import android.graphics.PathMeasure;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
+import android.graphics.PorterDuffXfermode;
+
 import com.android.gallery3d.R;
 import com.android.gallery3d.filtershow.filters.FilterDrawRepresentation.StrokeData;
 import com.android.gallery3d.filtershow.imageshow.PrimaryImage;
@@ -118,8 +120,12 @@ public class ImageFilterDraw extends ImageFilter {
             } else {
                 paint.setStrokeCap(Paint.Cap.ROUND);
             }
+            if (sd.mColor == FilterDrawRepresentation.DEFAULT_MENU_COLOR5) {
+                paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+            } else {
+                paint.setColor(sd.mColor);
+            }
             paint.setAntiAlias(true);
-            paint.setColor(sd.mColor);
             paint.setStrokeWidth(toScrMatrix.mapRadius(sd.mRadius));
 
             // done this way because of a bug in path.transform(matrix)
@@ -284,7 +290,14 @@ public class ImageFilterDraw extends ImageFilter {
         int h = bitmap.getHeight();
 
         Matrix m = getOriginalToScreenMatrix(w, h);
-        drawData(new Canvas(bitmap), m, quality);
+        Bitmap mOverlayBitmap = Bitmap.createBitmap(
+                w, h, Bitmap.Config.ARGB_8888);
+
+        drawData(new Canvas(mOverlayBitmap), m, quality);
+
+        Canvas canvas = new Canvas(bitmap);
+        Paint paint = new Paint(Paint.FILTER_BITMAP_FLAG);
+        canvas.drawBitmap(mOverlayBitmap, 0, 0, paint);
         return bitmap;
     }
 

@@ -13,11 +13,21 @@ android {
         externalNativeBuild {
             cmake {
                 cppFlags ""
+                abiFilters "arm64-v8a", "x86", "x86_64"
             }
         }
 
         ndk {
-            abiFilters "armeabi-v7a"
+            abiFilters "arm64-v8a", "x86", "x86_64"
+        }
+    }
+
+    splits {
+        abi {
+            enable true
+            reset()
+            include  'arm64-v8a', 'x86','x86_64'
+            universalApk true
         }
     }
     buildTypes {
