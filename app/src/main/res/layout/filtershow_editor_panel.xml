@@ -48,6 +48,57 @@
                     style="@style/FilterShowSlider"/>
 
         </LinearLayout>
+        <LinearLayout
+            android:id="@+id/listOptions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/draw_menu_style"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:background="@drawable/filtershow_color_picker_circle"
+                android:text="@string/filtershow_doodle_style"
+                android:layout_marginRight="4dp"/>
+
+            <Button
+                android:id="@+id/draw_menu_color"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:background="@drawable/filtershow_color_picker_circle"
+                android:text="@string/filtershow_doodle_color"
+                android:layout_marginRight="4dp"/>
+
+            <Button
+                android:id="@+id/draw_menu_size"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:background="@drawable/filtershow_color_picker_circle"
+                android:text="@string/filtershow_doodle_size"
+                android:layout_marginRight="4dp"/>
+
+            <Button
+                android:id="@+id/draw_menu_eraser"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:background="@drawable/filtershow_color_picker_circle"
+                android:text="@string/filtershow_doodle_eraser"
+                android:layout_marginRight="4dp"/>
+
+            <Button
+                android:id="@+id/draw_menu_clear"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:background="@drawable/filtershow_color_picker_circle"
+                android:text="@string/flitershow_doodle_clear"
+                android:layout_marginRight="4dp"/>
+        </LinearLayout>
 
         <LinearLayout
                 android:layout_width="match_parent"

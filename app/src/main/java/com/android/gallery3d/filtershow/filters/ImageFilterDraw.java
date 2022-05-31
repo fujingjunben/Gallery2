@@ -120,7 +120,7 @@ public class ImageFilterDraw extends ImageFilter {
             } else {
                 paint.setStrokeCap(Paint.Cap.ROUND);
             }
-            if (sd.mColor == FilterDrawRepresentation.DEFAULT_MENU_COLOR5) {
+            if (sd.mEraser) {
                 paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
             } else {
                 paint.setColor(sd.mColor);

@@ -76,6 +76,7 @@ public class EditorPanel extends Fragment {
         mMainView = (LinearLayout) inflater.inflate(R.layout.filtershow_editor_panel, null);
 
         View actionControl = mMainView.findViewById(R.id.panelAccessoryViewList);
+        View listOptions = mMainView.findViewById(R.id.listOptions);
         View editControl = mMainView.findViewById(R.id.controlArea);
         ImageButton cancelButton = (ImageButton) mMainView.findViewById(R.id.cancelFilter);
         ImageButton applyButton = (ImageButton) mMainView.findViewById(R.id.applyFilter);
@@ -96,6 +97,7 @@ public class EditorPanel extends Fragment {
             mEditor.reflectCurrentFilter();
             if (mEditor.useUtilityPanel()) {
                 mEditor.openUtilityPanel((LinearLayout) actionControl);
+                mEditor.openUtilityPanel((LinearLayout) actionControl, (LinearLayout) listOptions);
             }
         }
         applyButton.setOnClickListener(new View.OnClickListener() {

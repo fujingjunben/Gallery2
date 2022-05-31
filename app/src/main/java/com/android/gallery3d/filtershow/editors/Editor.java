@@ -281,6 +281,13 @@ public class Editor implements OnSeekBarChangeListener, SwapButton.SwapButtonLis
         }
     }
 
+    public void openUtilityPanel(LinearLayout mAccessoryViewList, LinearLayout listOptions) {
+        setMenuIcon(showsPopupIndicator());
+        if (mImageShow != null) {
+            mImageShow.openUtilityPanel(mAccessoryViewList);
+        }
+    }
+
     protected void setMenuIcon(boolean on) {
         mEditTitle.setCompoundDrawablesRelativeWithIntrinsicBounds(
                 0, 0, on ? R.drawable.filtershow_menu_marker_rtl : 0, 0);

@@ -16,6 +16,7 @@
 
 package com.android.gallery3d.filtershow.filters;
 
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.graphics.Path;
 import android.graphics.PathMeasure;
@@ -41,17 +42,17 @@ public class FilterDrawRepresentation extends FilterRepresentation {
     public static final int PARAM_SIZE = 0;
     public static final int PARAM_STYLE = 1;
     public static final int PARAM_COLOR = 2;
+    public static final int PARAM_ERASER = 3; // eraser
     private BasicParameterInt mParamSize = new BasicParameterInt(PARAM_SIZE, 30, 2, 300);
+    private BasicParameterInt mParamEraser = new BasicParameterInt(PARAM_SIZE, 30, 2, 300);
     private BasicParameterStyle mParamStyle = new BasicParameterStyle(PARAM_STYLE, 5);
     public static int DEFAULT_MENU_COLOR1 = Color.RED & 0x80FFFFFF;
     public static int DEFAULT_MENU_COLOR2 = Color.GREEN & 0x80FFFFFF;
     public static int DEFAULT_MENU_COLOR3 = Color.BLUE & 0x80FFFFFF;
     public static int DEFAULT_MENU_COLOR4 = Color.BLACK & 0x80FFFFFF;
     public static int DEFAULT_MENU_COLOR5 = Color.WHITE & 0x80FFFFFF;
-    public static int DEFAULT_MENU_COLOR6 = Color.TRANSPARENT & 0x80FFFFFF;
     ParameterColor mParamColor = new ParameterColor(PARAM_COLOR, DEFAULT_MENU_COLOR1);
     int mParamMode;
-    int mXfermode = -1;
     Parameter mCurrentParam = mParamSize;
     private static final String SERIAL_COLOR = "color";
     private static final String SERIAL_RADIUS = "radius";
@@ -59,22 +60,18 @@ public class FilterDrawRepresentation extends FilterRepresentation {
     private static final String SERIAL_POINTS_COUNT = "point_count";
     private static final String SERIAL_POINTS = "points";
     private static final String SERIAL_PATH = "path";
-    private static final String SERIAL_XFERMODE = "xfermode";
-
+    private static final String SERIAL_ERASER = "eraser";
 
     private Parameter[] mAllParam = {
             mParamSize,
             mParamStyle,
-            mParamColor
+            mParamColor,
+            mParamEraser,
     };
 
     public void setPramMode(int mode) {
         mParamMode = mode;
         mCurrentParam = mAllParam[mParamMode];
-    }
-
-    public void setmXfermode(int mode) {
-        mXfermode = mode;
     }
 
     public int getParamMode() {
@@ -94,7 +91,7 @@ public class FilterDrawRepresentation extends FilterRepresentation {
         public Path mPath;
         public float mRadius;
         public int mColor;
-        public int mXfermode;
+        public boolean mEraser;
         public int noPoints = 0;
         public float[] mPoints = new float[20];
 
@@ -106,7 +103,7 @@ public class FilterDrawRepresentation extends FilterRepresentation {
             mPath = new Path(copy.mPath);
             mRadius = copy.mRadius;
             mColor = copy.mColor;
-            mXfermode = copy.mXfermode;
+            mEraser = copy.mEraser;
             noPoints = copy.noPoints;
             mPoints = Arrays.copyOf(copy.mPoints, copy.mPoints.length);
         }
@@ -120,7 +117,7 @@ public class FilterDrawRepresentation extends FilterRepresentation {
             if (mType != sd.mType
                     || mRadius != sd.mRadius
                     || noPoints != sd.noPoints
-                    || mXfermode != sd.mXfermode
+                    || mEraser != sd.mEraser
                     || mColor != sd.mColor) {
                 return false;
             }
@@ -130,7 +127,7 @@ public class FilterDrawRepresentation extends FilterRepresentation {
         @Override
         public String toString() {
             return "stroke(" + mType + ", path(" + (mPath) + "), " + mRadius + " , "
-                    + Integer.toHexString(mColor) + ")";
+                    + Integer.toHexString(mColor) + ", eraserEnabled(" + mEraser +")" + ")";
         }
 
         @Override
@@ -152,6 +149,7 @@ public class FilterDrawRepresentation extends FilterRepresentation {
                 val = ((ParameterColor) mAllParam[mParamMode]).getValue();
                 return "";
             case PARAM_SIZE:
+            case PARAM_ERASER:
                 val = ((BasicParameterInt) mAllParam[mParamMode]).getValue();
                 return ((val > 0) ? " +" : " ") + val;
             case PARAM_STYLE:
@@ -207,6 +205,7 @@ public class FilterDrawRepresentation extends FilterRepresentation {
         return getDrawing().isEmpty();
     }
 
+    @SuppressLint("LongLogTag")
     @Override
     public void useParametersFrom(FilterRepresentation a) {
         if (a instanceof FilterDrawRepresentation) {
@@ -277,11 +276,15 @@ public class FilterDrawRepresentation extends FilterRepresentation {
     public void fillStrokeParameters(StrokeData sd) {
         byte type = (byte) mParamStyle.getSelected();
         int color = computeCurrentColor();
-        float size = mParamSize.getValue();
+        float size = isEraserMode() ? mParamEraser.getValue() : mParamSize.getValue();
         sd.mColor = color;
         sd.mRadius = size;
         sd.mType = type;
-        sd.mXfermode = mXfermode;
+        sd.mEraser = isEraserMode();
+    }
+
+    private boolean isEraserMode(){
+        return mParamMode == PARAM_ERASER;
     }
 
     public void startNewSection(float x, float y) {
@@ -338,7 +341,7 @@ public class FilterDrawRepresentation extends FilterRepresentation {
             writer.name(SERIAL_TYPE).value(mark.mType);
             writer.name(SERIAL_POINTS_COUNT).value(mark.noPoints);
             writer.name(SERIAL_POINTS);
-            writer.name(SERIAL_XFERMODE).value(mark.mXfermode);
+            writer.name(SERIAL_ERASER).value(mark.mEraser);
 
             writer.beginArray();
             int npoints = mark.noPoints * 2;
@@ -365,8 +368,8 @@ public class FilterDrawRepresentation extends FilterRepresentation {
                 String name = sreader.nextName();
                 if (name.equals(SERIAL_COLOR)) {
                     stroke.mColor = sreader.nextInt();
-                } else if (name.equals(SERIAL_COLOR)) {
-                    stroke.mXfermode = sreader.nextInt();
+                } else if (name.equals(SERIAL_ERASER)) {
+                    stroke.mEraser = sreader.nextBoolean();
                 } else if (name.equals(SERIAL_RADIUS)) {
                     stroke.mRadius = (float) sreader.nextDouble();
                 } else if (name.equals(SERIAL_TYPE)) {

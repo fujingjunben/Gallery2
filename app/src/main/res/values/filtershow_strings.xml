@@ -327,5 +327,9 @@
     <string name="filtershow_exif_exposure_time">Exposure Time</string>
     <!-- Label for exif tags in the information panel [CHAR LIMIT=50] -->
     <string name="filtershow_exif_copyright">Copyright</string>
-
+    <string name="filtershow_doodle_style">Doodle</string>
+    <string name="filtershow_doodle_color">Color</string>
+    <string name="filtershow_doodle_size">Size</string>
+    <string name="filtershow_doodle_eraser">Eraser</string>
+    <string name="flitershow_doodle_clear">Clear</string>
 </resources>

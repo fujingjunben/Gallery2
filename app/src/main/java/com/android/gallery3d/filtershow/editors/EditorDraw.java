@@ -30,6 +30,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.SeekBar;
+
 import com.android.gallery3d.R;
 import com.android.gallery3d.filtershow.FilterShowActivity;
 import com.android.gallery3d.filtershow.controller.BitmapCaller;
@@ -62,6 +63,14 @@ public class EditorDraw extends ParametricEditor implements FilterView {
             FilterDrawRepresentation.DEFAULT_MENU_COLOR3,
             FilterDrawRepresentation.DEFAULT_MENU_COLOR4,
             FilterDrawRepresentation.DEFAULT_MENU_COLOR5,
+    };
+
+    int[] options = {
+            R.id.draw_menu_clear,
+            R.id.draw_menu_size,
+            R.id.draw_menu_style,
+            R.id.draw_menu_color,
+            R.id.draw_menu_eraser,
     };
     private EditorDrawTabletUI mTabletUI;
     private String mParameterString;
@@ -126,18 +135,68 @@ public class EditorDraw extends ParametricEditor implements FilterView {
     }
 
     @Override
-    public void openUtilityPanel(final LinearLayout accessoryViewList) {
-        Button view = (Button) accessoryViewList.findViewById(R.id.applyEffect);
+    public void openUtilityPanel(final LinearLayout accessoryViewList, final LinearLayout listOptions) {
+//        Button view = (Button) accessoryViewList.findViewById(R.id.applyEffect);
+//        view.setText(mContext.getString(R.string.draw_color));
+//        view.setOnClickListener(new OnClickListener() {
+//
+//            @Override
+//            public void onClick(View arg0) {
+//                showPopupMenu(accessoryViewList);
+//            }
+//        });
 
-        view.setText(mContext.getString(R.string.draw_color));
-        view.setOnClickListener(new OnClickListener() {
+        for (int id : options) {
+            final Button button = (Button) listOptions.findViewById(id);
+            button.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    selectButton(button);
+                }
+            });
+        }
+    }
 
-            @Override
-            public void onClick(View arg0) {
-                showPopupMenu(accessoryViewList);
-            }
-        });
+    protected void selectButton(Button button) {
+        ImageFilterDraw filter = (ImageFilterDraw) mImageShow.getCurrentFilter();
+        FilterDrawRepresentation rep = getDrawRep();
+        if (rep == null) {
+            return;
+        }
 
+        switch (button.getId()) {
+            case R.id.draw_menu_clear:
+                clearDrawing();
+                break;
+            case R.id.draw_menu_size:
+                rep.setPramMode(FilterDrawRepresentation.PARAM_SIZE);
+                break;
+            case R.id.draw_menu_style:
+                rep.setPramMode(FilterDrawRepresentation.PARAM_STYLE);
+                break;
+            case R.id.draw_menu_color:
+                rep.setPramMode(FilterDrawRepresentation.PARAM_COLOR);
+                break;
+            case R.id.draw_menu_eraser:
+                rep.setPramMode(FilterDrawRepresentation.PARAM_ERASER);
+                break;
+        }
+        if (button.getId() != R.id.draw_menu_clear) {
+            mParameterString = button.getText().toString();
+            updateText();
+        }
+        // 如果当前控制器是颜色选择，就拿到当前选择的颜色
+        if (mControl instanceof ColorChooser) {
+            ColorChooser c = (ColorChooser) mControl;
+            mBasColors = c.getColorSet();
+        }
+        control(rep.getCurrentParam(), mEditControl);
+        if (mControl instanceof ColorChooser) {
+            ColorChooser c = (ColorChooser) mControl;
+            c.setColorSet(mBasColors);
+        }
+        mControl.updateUI();
+        mView.invalidate();
     }
 
     @Override
@@ -181,7 +240,7 @@ public class EditorDraw extends ParametricEditor implements FilterView {
             });
         }
         popupMenu.show();
-        ((FilterShowActivity)mContext).onShowMenu(popupMenu);
+        ((FilterShowActivity) mContext).onShowMenu(popupMenu);
     }
 
     protected void selectMenuItem(MenuItem item) {
@@ -209,6 +268,7 @@ public class EditorDraw extends ParametricEditor implements FilterView {
             mParameterString = item.getTitle().toString();
             updateText();
         }
+        // 如果当前控制器是颜色选择，就拿到当前选择的颜色
         if (mControl instanceof ColorChooser) {
             ColorChooser c = (ColorChooser) mControl;
             mBasColors = c.getColorSet();
@@ -222,7 +282,7 @@ public class EditorDraw extends ParametricEditor implements FilterView {
         mView.invalidate();
     }
 
-    public void clearDrawing(){
+    public void clearDrawing() {
         ImageDraw idraw = (ImageDraw) mImageShow;
         idraw.resetParameter();
         commitLocalRepresentation();
