@@ -16,9 +16,8 @@
 
 package com.android.gallery3d.filtershow.controller;
 
-public interface FilterView {
-    public void computeIcon(int index, BitmapCaller caller);
-    public void computeIcon(int index, DrawableCaller caller);
+import android.graphics.drawable.Drawable;
 
-    public void commitLocalRepresentation();
+public interface DrawableCaller {
+    public void available(Drawable drawable);
 }

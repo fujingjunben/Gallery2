@@ -20,6 +20,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -36,6 +37,7 @@ import com.android.gallery3d.R;
 import com.android.gallery3d.filtershow.FilterShowActivity;
 import com.android.gallery3d.filtershow.controller.BitmapCaller;
 import com.android.gallery3d.filtershow.controller.ColorChooser;
+import com.android.gallery3d.filtershow.controller.DrawableCaller;
 import com.android.gallery3d.filtershow.controller.FilterView;
 import com.android.gallery3d.filtershow.filters.FilterDrawRepresentation;
 import com.android.gallery3d.filtershow.filters.FilterRepresentation;
@@ -51,11 +53,11 @@ public class EditorDraw extends ParametricEditor implements FilterView {
     private static final int MODE_STYLE = FilterDrawRepresentation.PARAM_STYLE;
     private static final int MODE_COLOR = FilterDrawRepresentation.PARAM_COLOR;
     int[] brushIcons = {
-            R.drawable.brush_flat,
-            R.drawable.brush_round,
-            R.drawable.brush_gauss,
-            R.drawable.brush_marker,
-            R.drawable.brush_spatter
+            R.drawable.filtershow_style_curve,
+            R.drawable.filtershow_style_arrow,
+            R.drawable.filtershow_style_line,
+            R.drawable.filtershow_style_rectangle,
+            R.drawable.filtershow_style_circle,
     };
 
     int[] mBasColors = {
@@ -236,6 +238,12 @@ public class EditorDraw extends ParametricEditor implements FilterView {
     public void computeIcon(int index, BitmapCaller caller) {
         Bitmap bitmap = BitmapFactory.decodeResource(mContext.getResources(), brushIcons[index]);
         caller.available(bitmap);
+    }
+
+    @Override
+    public void computeIcon(int index, DrawableCaller caller) {
+        Drawable drawable= mContext.getResources().getDrawable(brushIcons[index]);
+        caller.available(drawable);
     }
 
     public int getBrushIcon(int type) {

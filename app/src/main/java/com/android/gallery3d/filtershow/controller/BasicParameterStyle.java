@@ -93,6 +93,11 @@ public class BasicParameterStyle implements ParameterStyles {
     }
 
     @Override
+    public void getIcon(int index, DrawableCaller caller) {
+        mEditor.computeIcon(index, caller);
+    }
+
+    @Override
     public String getStyleTitle(int index, Context context) {
         return "";
     }

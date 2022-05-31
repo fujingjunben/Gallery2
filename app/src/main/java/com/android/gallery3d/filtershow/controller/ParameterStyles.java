@@ -30,6 +30,7 @@ public interface ParameterStyles extends Parameter {
     void setSelected(int value);
 
     void getIcon(int index, BitmapCaller caller);
+    void getIcon(int index, DrawableCaller caller);
 
     String getStyleTitle(int index, Context context);
 }

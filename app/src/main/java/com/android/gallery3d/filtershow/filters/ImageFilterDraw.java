@@ -55,10 +55,10 @@ public class ImageFilterDraw extends ImageFilter {
 
     DrawStyle[] mDrawingsTypes = new DrawStyle[]{
             new SimpleDraw(0),
+            new ArrowDraw(1),
             new LineDraw(1),
             new RectangleDraw(0),
             new EllipseDraw(1),
-            new Brush(R.drawable.brush_spatter)
     };
 
     {
@@ -203,6 +203,28 @@ public class ImageFilterDraw extends ImageFilter {
             float y = sd.mPoints[sd.noPoints * 2 - 1];
             Path path = new Path();
             path.moveTo(startX, startY);
+            path.lineTo(x, y);
+            return path;
+        }
+    }
+
+    class ArrowDraw extends SimpleDraw {
+        public ArrowDraw(int mode) {
+            super(mode);
+        }
+
+        @Override
+        public Path drawShape(StrokeData sd) {
+            float startX = sd.mPoints[0];
+            float startY = sd.mPoints[1];
+            float x = sd.mPoints[sd.noPoints * 2 - 2];
+            float y = sd.mPoints[sd.noPoints * 2 - 1];
+            Path path = new Path();
+            path.moveTo(startX, startY);
+            path.lineTo(x, y);
+            path.lineTo(x, y - 10);
+            path.lineTo(x + 15, y);
+            path.lineTo(x, y + 10);
             path.lineTo(x, y);
             return path;
         }

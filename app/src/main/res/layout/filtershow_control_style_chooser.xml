@@ -16,23 +16,10 @@
 -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res/com.example.imagefilterharness"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/listStyles"
     android:layout_width="match_parent"
-    android:layout_height="32dp"
+    android:layout_height="50dp"
     android:orientation="horizontal" >
-            <HorizontalScrollView
-                android:id="@+id/scrollList"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:scrollbars="none" >
-
-                <LinearLayout
-                    android:id="@+id/listStyles"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal" >
-                </LinearLayout>
-
-            </HorizontalScrollView>
 </LinearLayout>
 

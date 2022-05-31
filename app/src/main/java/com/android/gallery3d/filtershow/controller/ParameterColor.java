@@ -38,6 +38,7 @@ public class ParameterColor implements Parameter {
     public ParameterColor(int id, int defaultColor) {
         ID = id;
         Color.colorToHSV(defaultColor, mHSVO);
+        mValue = defaultColor;
         mHSVO[3] = ((defaultColor >> 24) & 0xFF) / (float) 255;
     }
 

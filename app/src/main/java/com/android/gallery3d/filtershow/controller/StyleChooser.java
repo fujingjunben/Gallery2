@@ -4,6 +4,7 @@ import android.app.ActionBar.LayoutParams;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,8 +39,13 @@ public class StyleChooser implements Control {
         mIconButton.clear();
         Resources res = context.getResources();
         int dim = res.getDimensionPixelSize(R.dimen.draw_style_icon_dim);
-        LayoutParams lp = new LayoutParams(dim, dim);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dim, dim);
+        lp.weight = 1.0f;
+        lp.rightMargin = 100;
         for (int i = 0; i < n; i++) {
+            if (i == 0) {
+                lp.leftMargin = 100;
+            }
             final ImageButton button = new ImageButton(context);
             button.setScaleType(ScaleType.CENTER_CROP);
             button.setLayoutParams(lp);
@@ -53,14 +59,14 @@ public class StyleChooser implements Control {
                 }
             });
             mLinearLayout.addView(button);
-            mParameter.getIcon(i, new BitmapCaller() {
+            mParameter.getIcon(i, new DrawableCaller() {
                 @Override
-                public void available(Bitmap bmap) {
+                public void available(Drawable drawable) {
 
-                    if (bmap == null) {
+                    if (drawable == null) {
                         return;
                     }
-                    button.setImageBitmap(bmap);
+                    button.setImageDrawable(drawable);
                 }
             });
         }
