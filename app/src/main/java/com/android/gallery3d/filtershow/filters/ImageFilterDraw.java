@@ -396,15 +396,15 @@ public class ImageFilterDraw extends ImageFilter {
         int h = bitmap.getHeight();
 
         Matrix m = getOriginalToScreenMatrix(w, h);
-        Bitmap mOverlayBitmap = Bitmap.createBitmap(
-                w, h, Bitmap.Config.ARGB_8888);
-//
-        drawData(new Canvas(mOverlayBitmap), m, quality);
+//        Bitmap mOverlayBitmap = Bitmap.createBitmap(
+//                w, h, Bitmap.Config.ARGB_8888);
 
-        Canvas canvas = new Canvas(bitmap);
-        Paint paint = new Paint(Paint.FILTER_BITMAP_FLAG);
-        canvas.drawBitmap(mOverlayBitmap, 0, 0, paint);
-//        drawData(new Canvas(bitmap), m ,quality);
+//        drawData(new Canvas(mOverlayBitmap), m, quality);
+//
+//        Canvas canvas = new Canvas(bitmap);
+//        Paint paint = new Paint(Paint.FILTER_BITMAP_FLAG);
+//        canvas.drawBitmap(mOverlayBitmap, 0, 0, paint);
+        drawData(new Canvas(bitmap), m ,quality);
         return bitmap;
     }
 

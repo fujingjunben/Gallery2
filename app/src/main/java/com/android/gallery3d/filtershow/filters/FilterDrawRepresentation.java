@@ -91,7 +91,7 @@ public class FilterDrawRepresentation extends FilterRepresentation {
         public Path mPath;
         public float mRadius;
         public int mColor;
-        public boolean mEraser;
+        public boolean mEraser = false;
         public int noPoints = 0;
         public float[] mPoints = new float[20];
 
@@ -340,11 +340,11 @@ public class FilterDrawRepresentation extends FilterRepresentation {
             writer.beginObject();
             StrokeData mark = mDrawing.get(i);
             writer.name(SERIAL_COLOR).value(mark.mColor);
+            writer.name(SERIAL_ERASER).value(mark.mEraser);
             writer.name(SERIAL_RADIUS).value(mark.mRadius);
             writer.name(SERIAL_TYPE).value(mark.mType);
             writer.name(SERIAL_POINTS_COUNT).value(mark.noPoints);
             writer.name(SERIAL_POINTS);
-            writer.name(SERIAL_ERASER).value(mark.mEraser);
 
             writer.beginArray();
             int npoints = mark.noPoints * 2;
